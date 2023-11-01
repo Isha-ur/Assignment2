@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Dashboard</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav {
+            background-color: #333;
+            color: white;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            display: inline;
+            margin-right: 15px;
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+
+        #page-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        #profile-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #user-logs-table {
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #333;
+            color: white;
+        }
+
+        #logout-link {
+            cursor: pointer;
+            color: #e74c3c;
+        }
+
+        #logout-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="#" id="change-password-link">Change Password</a></li>
+            <li><a href="#" id="user-logs-link">User Logs</a></li>
+            <li><a href="#" id="logout-link">Logout</a></li>
+        </ul>
+    </nav>
+    <div id="page-container">
+        <div id="profile-container">
+            <!-- User profile  -->
+        </div>
+        <div id="user-logs-table">
+            <!-- User logs  -->
+        </div>
+    </div>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const profileContainer = document.getElementById('profile-container');
+        const changePasswordLink = document.getElementById('change-password-link');
+        const userLogsLink = document.getElementById('user-logs-link');
+        const logoutLink = document.getElementById('logout-link');
+        const userLogsTable = document.getElementById('user-logs-table');
+
+        const userData = JSON.parse(localStorage.getItem("userKey"));
+        const userID = userData.userId;
+
+        // Fun to load user 
+        function loadUserProfile() {
+            profileContainer.innerHTML = `Welcome, ${userData.userName}`;
+        }
+
+        // Function user logs table
+        function createUserLogsTable(logs) {
+            const table = document.createElement('table');
+            table.className = 'user-logs-table';
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Log ID</th>
+                        <th>Timestamp</th>
+                        
+                        <th>Event Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            `;
+
+            const tbody = table.querySelector('tbody');
+            logs.forEach(log => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${log.log_id}</td>
+                    <td>${log.timestamp}</td>
+                    <td>${log.event_type}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            userLogsTable.innerHTML = '';
+            userLogsTable.appendChild(table);
+        }
+
+        
+        changePasswordLink.addEventListener('click', () => {
+            
+            window.location.href = '/UserChangePassword.html';
+        });
+
+        
+        userLogsLink.addEventListener('click', () => {
+            
+            axios.post('http://localhost:8000/user/user-logs', { userID })
+                .then(response => {
+                    
+                    console.log(response.data);
+                    createUserLogsTable(response.data);
+                })
+                .catch(error => {
+                    console.error('Error loading user logs:', error);
+                });
+        });
+
+        
+        logoutLink.addEventListener('click', () => {
+            
+            axios.post('http://localhost:8000/users/logout', { userID })
+                .then(response => {
+                    
+                    console.log('User logged out successfully');
+                    localStorage.clear();
+                    window.location.href = '/index.html'; 
+                })
+                .catch(error => {
+                    console.error('Error logging out:', error);
+                });
+        });
+
+        
+        loadUserProfile();
+    </script>
+</body>
+</html>

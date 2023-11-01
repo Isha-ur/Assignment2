@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Show All Users</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        #userList {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%; 
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #333;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Show All Users</h1>
+    <div id="userList">
+        <table>
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>User Name</th>
+                    <th>User Password</th>
+                    <th>User uniqueKey</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- User data  -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const userList = document.querySelector("#userList tbody");
+
+            // call get request 
+            axios.get('http://localhost:8000/admin/get-all-users')
+                .then(response => {
+                    const users = response.data;
+                    if (users.length > 0) {
+                        users.forEach(user => {
+                            const row = document.createElement("tr");
+                            row.innerHTML = `
+                                <td>${user.userID}</td>
+                                <td>${user.userName}</td>
+                                <td>${user.password}</td>
+                                <td>${user.uniqueKey}</td>
+                            `;
+                            userList.appendChild(row);
+                        });
+                    } else {
+                        userList.innerHTML = `<tr><td colspan="2">No users found.</td></tr>`;
+                    }
+                })
+                .catch(error => {
+                    userList.innerHTML = `<tr><td colspan="2">Error retrieving users.</td></tr>`;
+                    console.error(error);
+                });
+        });
+    </script>
+</body>
+</html>
