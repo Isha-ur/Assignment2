@@ -1,9 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
-const cors = require('cors');
+const cors = require('cors')
 const mysql = require('mysql2');
 const app = express();
-
 const port = 8000; 
 
 // middleware
